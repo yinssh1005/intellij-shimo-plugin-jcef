@@ -18,7 +18,7 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
     It's a plugin used for 石墨文档 users. So that they can edit doc inside the IDE.<br>
-    This plugin opens Shimo document editor directly within IntelliJ IDEA using JCEF browser.
+    This plugin opens Shimo document editor directly within IntelliJ IDEA using JCEF browser in an editor tab.
     Access it through the Tools → 石墨 menu.
   ]]></description>
 
@@ -30,12 +30,15 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Register Shimo tool window -->
-        <toolWindow id="Shimo" 
-                   secondary="true"
-                   icon="AllIcons.General.Web"
-                   anchor="right"
-                   factoryClass="i.s.p.j.intellijshimopluginjcef.toolwindow.ShimoToolWindowFactory"/>
+        <!-- Register Shimo file editor provider -->
+        <fileEditorProvider implementation="i.s.p.j.intellijshimopluginjcef.editor.ShimoFileEditorProvider"/>
+        
+        <!-- Register Shimo file type -->
+        <fileType 
+            implementationClass="i.s.p.j.intellijshimopluginjcef.file.ShimoFileType"
+            name="Shimo"
+            extensions="shimo"
+            fieldName="INSTANCE"/>
     </extensions>
     
     <actions>
@@ -48,7 +51,7 @@
             <action id="i.s.p.j.intellijshimopluginjcef.actions.OpenShimoAction"
                     class="i.s.p.j.intellijshimopluginjcef.actions.OpenShimoAction"
                     text="打开石墨文档"
-                    description="Open Shimo document editor in IntelliJ IDEA">
+                    description="Open Shimo document editor in an editor tab">
             </action>
         </group>
     </actions>

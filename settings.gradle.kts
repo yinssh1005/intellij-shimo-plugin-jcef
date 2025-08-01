@@ -1,0 +1,1 @@
+rootProject.name = "intellij-shimo-plugin-jcef"

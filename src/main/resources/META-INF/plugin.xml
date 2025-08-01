@@ -1,0 +1,55 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Include services configuration -->
+    <resource-bundle>messages.ShimoBundle</resource-bundle>
+    <xi:include href="/META-INF/plugin-services.xml" xpointer="xpointer(/idea-plugin/*)" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>i.s.p.j.intellij-shimo-plugin-jcef</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>IJ-shimo-jcef</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://www.ethanjb.xyz">EthanJB</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    It's a plugin used for 石墨文档 users. So that they can edit doc inside the IDE.<br>
+    This plugin opens Shimo document editor directly within IntelliJ IDEA using JCEF browser.
+    Access it through the Tools → 石墨 menu.
+  ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Register Shimo tool window -->
+        <toolWindow id="Shimo" 
+                   secondary="true"
+                   icon="AllIcons.General.Web"
+                   anchor="right"
+                   factoryClass="i.s.p.j.intellijshimopluginjcef.toolwindow.ShimoToolWindowFactory"/>
+    </extensions>
+    
+    <actions>
+        <!-- Add Shimo menu group to Tools menu -->
+        <group id="i.s.p.j.intellijshimopluginjcef.actions.ShimoActionGroup"
+               text="石墨"
+               description="Open Shimo documents in IntelliJ IDEA"
+               popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="i.s.p.j.intellijshimopluginjcef.actions.OpenShimoAction"
+                    class="i.s.p.j.intellijshimopluginjcef.actions.OpenShimoAction"
+                    text="打开石墨文档"
+                    description="Open Shimo document editor in IntelliJ IDEA">
+            </action>
+        </group>
+    </actions>
+</idea-plugin>

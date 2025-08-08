@@ -21,7 +21,7 @@ class ShimoFileEditor(private val project: Project, private val file: VirtualFil
     init {
         // Get the URL from the virtual file's user data, or use the default URL
         val url = file.getUserData(ShimoBrowserPanel.URL_KEY) ?: ShimoBrowserPanel.DEFAULT_URL
-        browserPanel = ShimoBrowserPanel(url)
+        browserPanel = ShimoBrowserPanel(project, url)
     }
     
     override fun getComponent(): JComponent {

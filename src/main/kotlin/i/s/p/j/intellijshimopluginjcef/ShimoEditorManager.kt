@@ -1,12 +1,10 @@
 package i.s.p.j.intellijshimopluginjcef
 
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.registry.Registry
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files

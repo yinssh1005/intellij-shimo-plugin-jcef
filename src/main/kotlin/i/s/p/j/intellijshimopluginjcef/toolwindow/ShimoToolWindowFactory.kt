@@ -19,7 +19,7 @@ class ShimoToolWindowFactory : ToolWindowFactory {
         logger.info("Creating Shimo tool window content")
         
         // Create browser panel
-        val browserPanel = ShimoBrowserPanel()
+        val browserPanel = ShimoBrowserPanel(project)
         
         // Create content for the tool window
         val contentFactory = ContentFactory.getInstance()

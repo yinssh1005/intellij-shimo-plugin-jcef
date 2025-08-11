@@ -39,6 +39,16 @@
             name="Shimo"
             extensions="shimo"
             fieldName="INSTANCE"/>
+
+        <!-- Register application-level service for settings state -->
+        <applicationService serviceImplementation="i.s.p.j.intellijshimopluginjcef.settings.ShimoSettingsState"/>
+
+        <!-- Settings page under Tools -> 石墨 -->
+        <applicationConfigurable
+            id="i.s.p.j.intellijshimopluginjcef.settings.shimo"
+            parentId="tools"
+            displayName="石墨"
+            instance="i.s.p.j.intellijshimopluginjcef.settings.ShimoSettingsConfigurable"/>
     </extensions>
     
     <actions>

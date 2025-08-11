@@ -15,8 +15,14 @@ import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.handler.CefLifeSpanHandlerAdapter
 import org.cef.handler.CefRequestHandlerAdapter
+import org.cef.handler.CefDownloadHandler
+import org.cef.callback.CefBeforeDownloadCallback
+import org.cef.callback.CefDownloadItemCallback
 import org.cef.network.CefRequest
+import org.cef.callback.CefDownloadItem
 import javax.swing.JComponent
+import i.s.p.j.intellijshimopluginjcef.settings.ShimoSettingsState
+import java.io.File
 
 /**
  * Panel that hosts a JCEF browser for displaying Shimo documents.
@@ -38,6 +44,8 @@ class ShimoBrowserPanel(private val project: Project, private val url: String = 
 
         // Install handlers to open links in a new IDE editor tab
         installOpenInNewEditorTabHandlers(browser.jbCefClient)
+        // Install download handler to auto-save files to configured directory
+        installDownloadHandler(browser.jbCefClient)
 
         // Load initial URL
         browser.loadURL(url)
@@ -121,6 +129,70 @@ class ShimoBrowserPanel(private val project: Project, private val url: String = 
      */
     fun getComponent(): JComponent {
         return browser.component
+    }
+
+    private fun installDownloadHandler(client: JBCefClient) {
+        client.addDownloadHandler(object : CefDownloadHandler {
+            override fun onBeforeDownload(
+                browser: CefBrowser?,
+                downloadItem: CefDownloadItem?,
+                suggestedName: String?,
+                callback: CefBeforeDownloadCallback?
+            ) {
+                try {
+                    val state = ShimoSettingsState.getInstance()
+                    val baseDir = state.downloadDirectory?.takeIf { it.isNotBlank() }
+                    val fileName = suggestedName?.takeUnless { it.isBlank() }
+                        ?: "download_${System.currentTimeMillis()}"
+
+                    if (baseDir.isNullOrBlank()) {
+                        // No configured path; let JCEF show its default dialog
+                        callback?.Continue(fileName, true)
+                        return
+                    }
+
+                    val safeDir = File(baseDir)
+                    if (!safeDir.exists()) safeDir.mkdirs()
+
+                    val target = uniqueFile(File(safeDir, sanitizeFileName(fileName)))
+                    // Continue download without showing dialog
+                    callback?.Continue(target.absolutePath, false)
+                } catch (t: Throwable) {
+                    logger.warn("onBeforeDownload failed; falling back to default dialog", t)
+                    callback?.Continue(suggestedName ?: "download", true)
+                }
+            }
+
+            override fun onDownloadUpdated(
+                browser: CefBrowser?,
+                downloadItem: CefDownloadItem?,
+                callback: CefDownloadItemCallback?
+            ) {
+                if (downloadItem != null && downloadItem.isCanceled) {
+                    logger.info("Download canceled: ${downloadItem.suggestedFileName}")
+                }
+                if (downloadItem != null && downloadItem.isComplete) {
+                    logger.info("Download completed: ${downloadItem.fullPath}")
+                }
+            }
+        }, browser.cefBrowser)
+    }
+
+    private fun sanitizeFileName(name: String): String {
+        val cleaned = name.replace(Regex("[\\/:*?\"<>|]"), "_")
+        return cleaned.ifBlank { "download_${System.currentTimeMillis()}" }
+    }
+
+    private fun uniqueFile(base: File): File {
+        if (!base.exists()) return base
+        val name = base.nameWithoutExtension
+        val ext = base.extension
+        var idx = 1
+        while (true) {
+            val candidate = File(base.parentFile, if (ext.isNotEmpty()) "$name ($idx).$ext" else "$name ($idx)")
+            if (!candidate.exists()) return candidate
+            idx++
+        }
     }
 
     /**
